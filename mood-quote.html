@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mood-Based Quote Generator</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 40px;
+        background: linear-gradient(to right, #6dd5ed, #2193b0);
+        transition: background 0.5s ease;
+        color: white;
+    }
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+    select, button {
+        padding: 10px;
+        margin: 10px;
+        border-radius: 8px;
+        border: none;
+        font-size: 1rem;
+    }
+    button {
+        background: #ff7e5f;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background: #e55d4a;
+    }
+    #quote-box {
+        margin-top: 30px;
+        font-size: 1.3rem;
+        padding: 20px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        min-height: 60px;
+    }
+</style>
+</head>
+<body>
+
+<h1>🌈 Mood-Based Quote Generator 🌈</h1>
+<p>Select your mood and get a live or offline matching quote!</p>
+
+<select id="mood">
+    <option value="">-- Select Mood --</option>
+    <option value="happiness">😊 Happy</option>
+    <option value="inspirational">😔 Sad</option>
+    <option value="success">😫 Stressed</option>
+    <option value="dreams">🤩 Excited</option>
+</select>
+
+<button onclick="generateQuote()">Get Quote</button>
+
+<div id="quote-box">Your mood quote will appear here...</div>
+
+<script>
+    const backgrounds = {
+        happiness: "linear-gradient(to right, #fbc2eb, #a6c1ee)",
+        inspirational: "linear-gradient(to right, #373b44, #4286f4)",
+        success: "linear-gradient(to right, #ff9966, #ff5e62)",
+        dreams: "linear-gradient(to right, #00f260, #0575e6)"
+    };
+
+    const fallbackQuotes = {
+        happiness: [
+            "Happiness is not something ready-made. It comes from your own actions.",
+            "The purpose of our lives is to be happy.",
+            "Smile, it’s free therapy."
+        ],
+        inspirational: [
+            "Stars can’t shine without darkness.",
+            "Tough times never last, but tough people do.",
+            "This too shall pass."
+        ],
+        success: [
+            "Success is not final, failure is not fatal.",
+            "Do what you can, with what you have, where you are.",
+            "Small steps every day lead to big results."
+        ],
+        dreams: [
+            "The future belongs to those who believe in their dreams.",
+            "Dream big and dare to fail.",
+            "Your energy introduces you before you even speak."
+        ]
+    };
+
+    async function generateQuote() {
+        const mood = document.getElementById("mood").value;
+        const quoteBox = document.getElementById("quote-box");
+
+        if (!mood) {
+            quoteBox.innerHTML = "Please select a mood first.";
+            return;
+        }
+
+        document.body.style.background = backgrounds[mood];
+        quoteBox.innerHTML = "Fetching quote...";
+
+        try {
+            const response = await fetch(`https://api.quotable.io/random?tags=${mood}`);
+            if (!response.ok) throw new Error("API error");
+            const data = await response.json();
+            quoteBox.innerHTML = `"${data.content}" — ${data.author}`;
+        } catch (error) {
+            // Use offline fallback quotes
+            const randomQuote = fallbackQuotes[mood][Math.floor(Math.random() * fallbackQuotes[mood].length)];
+            quoteBox.innerHTML = `"${randomQuote}" — Offline Mode`;
+        }
+    }
+</script>
+
+</body>
+</html>
